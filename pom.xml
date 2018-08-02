@@ -241,7 +241,7 @@
             <resource>
                 <directory>src/main/java</directory>
                 <includes>
-                    <include>com/mapper/*.xml</include>
+                    <include>com/dao/mapper/*.xml</include>
                 </includes>
                 <filtering>false</filtering>
             </resource>
