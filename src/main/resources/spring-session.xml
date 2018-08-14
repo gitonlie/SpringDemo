@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	<!-- <bean id="redisHttpSessionConfiguration"
+      class="org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration">
+    	<property name="maxInactiveIntervalInSeconds" value="600"/>
+	</bean> -->
+
+	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+    	<property name="maxTotal" value="100" />
+    	<property name="maxIdle" value="10" />
+	</bean>
+
+	<bean id="jedisConnectionFactory"
+      class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" destroy-method="destroy">
+    	<property name="hostName" value="${redis_hostname}"/>
+    	<property name="port" value="${redis_port}"/>
+    	<property name="password" value="${redis_pwd}" />
+    	<property name="timeout" value="3000"/>
+    	<property name="usePool" value="true"/>
+    	<property name="poolConfig" ref="jedisPoolConfig"/>
+	</bean>
+</beans> 

@@ -6,4 +6,8 @@
 	<insert id="insertUserInfo" parameterType="User">
 		insert into user(name) values(#{name})
 	</insert>
+	
+	<select id="queryUser" resultType="User" parameterType="User">
+		select * from user where id=#{id}
+	</select>
 </mapper>

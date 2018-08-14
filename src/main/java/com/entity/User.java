@@ -1,8 +1,12 @@
 package com.entity;
 
-public class User {
+import java.io.Serializable;
+import java.util.Date;
+
+public class User implements Serializable{
 	private Long id;
 	private String name;
+	private Date createDate;
 	public Long getId() {
 		return id;
 	}
@@ -15,6 +19,11 @@ public class User {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+	public Date getCreateDate() {
+		return createDate;
+	}
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
 	
 }

@@ -1,5 +1,6 @@
 package com.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,13 @@ public class UserService implements IUserService {
 		}
 		userdao.insertUserInfo(user);
 		return 1;
+	}
+	
+	@Override
+	@Cacheable(value="queryUser")
+	public User queryUserInfo(User user) {
+		User u = userdao.queryUser(user);
+		return u;
 	}
 
 }
