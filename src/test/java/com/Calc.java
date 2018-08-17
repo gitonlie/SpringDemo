@@ -8,6 +8,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import redis.clients.jedis.Jedis;
 
 import com.thread.MyCallable;
+import com.util.DistributedLockUtil;
+import com.util.RedisTools;
 /**
  * java.util.concurrent - Java并发工具包
  * @author Administrator
@@ -34,6 +36,6 @@ public class Calc {
 	}
 	
 	public static void main(String[] args) {
-		//Jedis jedis
+		
 	}
 }
