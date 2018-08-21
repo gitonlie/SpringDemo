@@ -1,7 +1,9 @@
 package com.thread;
 import java.util.concurrent.TimeUnit;
-import com.util.DistributedLockUtil;
+
+import com.redis.DistributedLockUtil;
 import com.util.RedisTools;
+
 import redis.clients.jedis.Jedis;
 
 /**

@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
+import com.redis.DistributedLockUtil;
 import com.util.Constant;
-import com.util.DistributedLockUtil;
 import com.util.RedisTools;
 
 public class GoodsCallable implements Callable<Object> {
@@ -33,16 +33,29 @@ public class GoodsCallable implements Callable<Object> {
 				
 				if(jedis.hexists(Constant.GOODS,field)){
 					String c = jedis.hget(Constant.GOODS,field);
+					if(c!=null){
+						int count = new Integer(c);
+						if(count>0){
+							Long m = jedis.hset(Constant.GOODS, field,String.valueOf(count-1));
+							if(m==0L){
+								System.out.println(client+"成功抢单！");
+								jedis.sadd("userlist", client);
+							}
+						}else{
+							System.out.println(client+"抢单失败！，库存不足");
+						}
+					}
 				}
+				DistributedLockUtil.unlock(pid, client);
 			}catch(Exception e){
-				
+				e.printStackTrace();
 			}finally{
-				
+				jedis.close();
 			}
 		}else{
 			logger.info("{}未取得锁{}",client,pid);
 		}
-		return pid;
+		return client;
 	}
 	
 	protected String plusStock(){

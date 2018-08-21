@@ -1,4 +1,4 @@
-package com.util;
+package com.redis;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +16,8 @@ import com.entity.Goods;
 import com.service.IGoodsService;
 import com.thread.ProductProgram1Runnable;
 import com.thread.ProductProgram2Runnable;
+import com.util.RedisTools;
+import com.util.SpringContextHolder;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -150,6 +152,7 @@ public class DistributedLockUtil {
      * 初始化商品列表
      */
     public static void initInventory(){
+    	logger.info("初始化数据");
     	String dataKey = "goods";
     	IGoodsService service = SpringContextHolder.getBean("goodsService");
     	List<Goods> list = service.queryGoodsList();
@@ -214,7 +217,6 @@ public class DistributedLockUtil {
      */
     public static void unlock(String productKey,String owner){
     	Jedis jedis = null;
-    	productKey = "lock:"+productKey;
     	try{
     		jedis = jedisPool.getResource();
     		if(owner.equals(jedis.get(productKey))){
@@ -226,107 +228,5 @@ public class DistributedLockUtil {
     	}finally{
     		jedis.close();
     	}
-    }
-    /**
-     * 记录拥有名单
-     * @param msg
-     */
-    public static void recordLog(String msg){
-    	Jedis jedis = null;
-    	String logKey = "log";
-    	try{
-    		jedis = jedisPool.getResource();
-    		Long i = jedis.rpush(logKey,new String[]{"4545"});
-    		logger.info(String.valueOf(i));
-    	}catch(Exception e){
-    		e.printStackTrace();
-    	}finally{
-    		jedis.close();
-    	}
-    }
-    
-    
-    public static void incBy(String hkey,String mkey){
-    	Jedis jedis = null;
-    	try{
-    		jedis = jedisPool.getResource();
-    		if(jedis.hexists(hkey, mkey)){
-    			String c = jedis.hget(hkey, mkey);
-    			if(c!=null){
-    				jedis.hincrBy(hkey, mkey, -1l);
-    			}
-    		}
-    	}catch(Exception e){
-    		e.printStackTrace();
-    	}finally{
-    		jedis.close();
-    	}
-    }
-    /**
-     * 加锁
-     * @param locaName  锁的key
-     * @param acquireTimeout 毫秒  获取超时时间(轮询锁)
-     * @param timeout 毫秒  锁的超时时间
-     * @return 锁标识
-     */
-    public static Map<String,String> lockWithTimeout(String locaName,
-            long acquireTimeout, long timeout){
-    	//获取连接
-    	Map<String,String> map = new HashMap<String, String>();
-    	Jedis jedis = null;
-    	String retIdentifier = null;
-    	try{
-    			jedis = jedisPool.getResource();
-    	        // 随机生成一个锁ID
-    	        String identifier = UUID.randomUUID().toString();
-    	        // 锁名，即key值
-    	        String lockKey = "lock:" + locaName;
-    	        // 超时时间，上锁后超过此时间则自动释放锁
-    	        int lockExpire = (int)(timeout / 1000);
-    	        // 获取锁的超时时间，超过这个时间则放弃获取锁
-    	        long end = System.currentTimeMillis() + acquireTimeout;
-    	        while(System.currentTimeMillis()<end){
-    	        	if (jedis.setnx(lockKey, identifier) == 1) {
-    	        		jedis.expire(lockKey, lockExpire);
-    	                // 返回value值，用于释放锁时间确认
-    	        		String ros = String.valueOf(a.incrementAndGet());
-    	        		logger.info(identifier+":获得锁{}>{}",lockKey,ros);
-    	                retIdentifier = identifier;
-    	                map.put("ros", ros);
-    	                map.put("lockId", retIdentifier);
-    	                return map;
-    	            }
-    	        }
-    	        
-    	        Thread.sleep(100);
-    	}catch(Exception e){
-    		e.printStackTrace();
-    	}finally{
-    		jedis.close();
-    	}  
-    	return map;
-    }
-    
-    /**
-     * 释放锁
-     * @param lockName 锁的key
-     * @param identifier    释放锁的标识
-     * @return
-     */
-    public static boolean releaseLock(String lockName, String identifier,String s){
-    	//获取连接
-    	Jedis jedis = null;
-    	try{
-    		jedis = jedisPool.getResource();
-    		String lockKey = "lock:" + lockName;
-            jedis.del(lockKey);
-            logger.info(identifier+":释放锁{}>{}",lockKey,s);
-    	}
-    	catch(Exception e){
-    		e.printStackTrace();
-    	}finally{
-    		jedis.close();
-    	}        
-		return true;  	
     }
 }

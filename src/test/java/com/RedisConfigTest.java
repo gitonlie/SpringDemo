@@ -15,8 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import redis.clients.jedis.Jedis;
 
+import com.redis.DistributedLockUtil;
 import com.thread.GoodsCallable;
-import com.util.DistributedLockUtil;
 import com.util.RedisTools;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations={"classpath:applicationContext.xml"})
@@ -26,23 +26,23 @@ public class RedisConfigTest {
 
 	@Test
 	public void test() throws Exception{
-		
-		/*ExecutorService service = Executors.newFixedThreadPool(10);
+		DistributedLockUtil.initInventory();
+		ExecutorService service = Executors.newFixedThreadPool(10);
 		List<FutureTask<Object>> list = new ArrayList<FutureTask<Object>>();
-		for(int i=0;i<100;i++){
+		for(int i=0;i<30000;i++){
 			FutureTask<Object> task = new FutureTask<Object>(new GoodsCallable(i));
 			list.add(task);
 			service.submit(task);
 		}
 	
 		for(FutureTask<Object> futureTask:list){
-			String lockID = (String) futureTask.get();
+			String client = (String) futureTask.get();
 		}
 		
 		service.shutdown();
 		while(service.isTerminated()){
 			break;
-		}*/
-		DistributedLockUtil.initInventory();
+		}
+		
 	}
 }
