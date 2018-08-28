@@ -14,5 +14,6 @@
                         http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">                                           
         <import resource="spring-import.xml"/>
         <import resource="spring-mybatis.xml"/>
-        <import resource="spring-redis.xml"/>
+        <!-- <import resource="spring-redis.xml"/> -->
+        <import resource="spring-session.xml"/>
 </beans>
